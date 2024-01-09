@@ -46,6 +46,8 @@ def main():
                 run = False
         pygame.display.flip()
         letterBox.x += 1
+        if letterBox.x == 900:
+            letterBox.x = 0
         
     pygame.quit()
 
