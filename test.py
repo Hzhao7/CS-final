@@ -26,13 +26,13 @@ def player_movement(keys_pressed, player): # does player movement
     if keys_pressed[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
         player.x -= player_speed  
         print("pressed a")
-    elif keys_pressed[pygame.K_d] and player.x + player_speed + 128 < 900:  #replace the 128s with the dimentions of the character
+    if keys_pressed[pygame.K_d] and player.x + player_speed + 128 < 900:  #replace the 128s with the dimentions of the character
         player.x += player_speed  
         print("pressed d")
-    elif keys_pressed[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
+    if keys_pressed[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
         player.y -= player_speed  
         print("pressed w")
-    elif keys_pressed[pygame.K_s] and player.y + player_speed + 128 < 500:  
+    if keys_pressed[pygame.K_s] and player.y + player_speed + 128 < 500:  
         player.y += player_speed  
         print("pressed s")
 
