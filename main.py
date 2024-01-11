@@ -21,14 +21,15 @@ protagonist = pygame.image.load(os.path.join('placeholder_character.png')) #load
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 128, 128) #creates a rectangle for the player to check collision
+player_speed = 5
 
-class Enemy:
-    def __init__(self, sprite, health, speed, damage):
+class Enemy: #enemy class code
+    def __init__(self, sprite, health, speed, damage): # initialtion 
         self.health = health 
         self.speed = speed
         self.damage = damage
         self.sprite = pygame.image.load(sprite)
-        #self.sprite = pygame.transform.scale(image, (128, 128))
+        self.sprite = pygame.transform.scale(self.sprite, (128, 128))
         number = random.randint(1,4)
         if number == 1: #generates in anywhere on the left side
             self.rectangle = pygame.Rect(0, random.randint(0,720), 128, 128)
@@ -38,10 +39,16 @@ class Enemy:
             self.rectangle = pygame.Rect(random.randint(0,1280), 0, 128, 128)
         if number == 4: #generates in anywhere on the bottom side
             self.rectangle = pygame.Rect(random.randint(0,1280), 720, 128, 128)
-    def move_to_player(self, player_x, player_y):
+    def move_to_player(self, player_x, player_y): # moves the player
         screen.blit(self.sprite, (self.rectangle.x, self.rectangle.y))
-
-        angle = (math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))) #finds the angle between the player and the enemy
+        try:
+            angle = (math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))) #finds the angle between the player and the enemy
+            print(angle)
+        except:
+            if self.rectangle.y < player_y:
+                angle = math.pi*3/2
+            if self.rectangle.y > player_y:
+                angle = math.pi*1/2
         if self.rectangle.x < player_x: # depending on where the enemy is it will adjust to the player
             self.rectangle.x += self.speed*math.cos(angle)
         if self.rectangle.x > player_x:
@@ -58,15 +65,18 @@ while running:
     screen.fill("blue")
     # Event handling for key presses
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        background_pos[0] += 5
-        
-    if keys[pygame.K_RIGHT]:
-        background_pos[0] -= 5
-    if keys[pygame.K_UP]:
-        background_pos[1] += 5
-    if keys[pygame.K_DOWN]:
-        background_pos[1] -= 5
+    if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
+        player.x -= player_speed  
+        print("pressed a")
+    if keys[pygame.K_d] and player.x + player_speed + 128 < 1280:  #replace the 128s with the dimentions of the character
+        player.x += player_speed  
+        print("pressed d")
+    if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
+        player.y -= player_speed  
+        print("pressed w")
+    if keys[pygame.K_s] and player.y + player_speed + 128 < 720:  
+        player.y += player_speed  
+        print("pressed s")
 
     # Ensure that the background tiles in all directions by using modulo
     background_pos[0] %= bg_rect.width
@@ -82,7 +92,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     draw_player(player)
-    placeholder_enemy.move_to_player(640-64, 360-64)
+    placeholder_enemy.move_to_player(player.x, player.y)
     pygame.display.flip()
     clock.tick(60)
 
