@@ -3,20 +3,20 @@ import os
 import random
 import math
 
-pygame.init()
+# === GLOBAL VARIABLES ===
 screen_height = 720
 screen_width = 1280
+running = True
+
+pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Vampire Dyres")
 clock = pygame.time.Clock()
-running = True
 
 # Load the background image
 background_img = pygame.image.load('background.png')
 bg_rect = background_img.get_rect()
 background_pos = [0, 0]   # Initial position of the background
-
-# Tile size should match the background image size
 tile_size = (bg_rect.width, bg_rect.height)
 
 protagonist = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
