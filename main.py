@@ -24,6 +24,7 @@ def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 128, 128) #creates a rectangle for the player to check collision
 player_speed = 5
+player_health = 100
 
 class Enemy: #enemy class code
     def __init__(self, sprite, health, speed, damage): # initialtion 
@@ -59,6 +60,12 @@ class Enemy: #enemy class code
             self.rectangle.y += self.speed*math.sin(angle)
         if self.rectangle.y > player_y:
             self.rectangle.y -= self.speed*math.sin(angle)
+    def player_colision(self, player_rect):
+        global player_health
+        if self.rectangle.colliderect(player_rect):
+            player_health -= self.damage
+            print("hit")
+            print(player_health)
 
 placeholder_enemy = Enemy('placeholder_character.png', 1, 1, 1)
     
@@ -95,6 +102,7 @@ while running:
             running = False
     draw_player(player)
     placeholder_enemy.move_to_player(player.x, player.y)
+    placeholder_enemy.player_colision(player)
     pygame.display.flip()
     clock.tick(60)
 
