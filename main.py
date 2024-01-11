@@ -4,7 +4,9 @@ import random
 import math
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen_height = 720
+screen_width = 1280
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Vampire Dyres")
 clock = pygame.time.Clock()
 running = True
