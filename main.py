@@ -36,48 +36,51 @@ total_health = 100
 # Used for health bar
 player_health = total_health
 
-class Enemy: #enemy class code
-    def __init__(self, sprite, health, speed, damage): # initialtion 
-        self.health = health 
+class Enemy:
+    def __init__(self, sprite, health, speed, damage):
+        self.health = health
         self.speed = speed
         self.damage = damage
-        self.sprite = pygame.image.load(sprite)
-        self.sprite = pygame.transform.scale(self.sprite, (64, 64))
-        self.stored = self.speed # used to store the speed that was lost after colission
-        number = random.randint(1,4)
-        if number == 1: #generates in anywhere on the left side
-            self.rectangle = pygame.Rect(0, random.randint(0,720), 64, 64)
-        if number == 2: #generates in anywhere on the right side
-            self.rectangle = pygame.Rect(1280, random.randint(0,720), 64, 64)
-        if number == 3: #generates in anywhere on the top side
-            self.rectangle = pygame.Rect(random.randint(0,1280), 0, 64, 64)
-        if number == 4: #generates in anywhere on the bottom side
-            self.rectangle = pygame.Rect(random.randint(0,1280), 720, 64, 64)
-    def move_to_player(self, player_x, player_y): # moves the player
-        screen.blit(self.sprite, (self.rectangle.x, self.rectangle.y))
+        self.sprite = pygame.transform.scale(pygame.image.load(sprite), (64, 64)) # Combined two operations into one
+        self.stored_speed = speed # renamed stored variable to stored_speed to be more descriptive.
+
+        position_options = [ #Array of position options. Reduces repetitive code and allows for easy additions
+            pygame.Rect(0, random.randint(0,720), 64, 64), # Left
+            pygame.Rect(1280, random.randint(0,720), 64, 64), # Right
+            pygame.Rect(random.randint(0,1280), 0, 64, 64), # Top 
+            pygame.Rect(random.randint(0,1280), 720, 64, 64), # Bottom
+        ]
+
+        self.rectangle = random.choice(position_options)
+
+    def _get_angle(self, player_x, player_y): # refactor the calculations of getting an angle into a function for more readability
         try:
-            angle = (math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))) #finds the angle between the player and the enemy
-        except:
-            if self.rectangle.y < player_y:
-                angle = math.pi*3/2
-            if self.rectangle.y > player_y:
-                angle = math.pi*1/2
-        if self.rectangle.x < player_x: # depending on where the enemy is it will adjust to the player
-            self.rectangle.x += self.speed*math.cos(angle)
-        if self.rectangle.x > player_x:
-            self.rectangle.x -= self.speed*math.cos(angle)
-        if self.rectangle.y < player_y:
-            self.rectangle.y += self.speed*math.sin(angle)
-        if self.rectangle.y > player_y:
-            self.rectangle.y -= self.speed*math.sin(angle)
-    def player_colision(self, player_rect):
-        global player_health
+            return math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))
+        except ZeroDivisionError:
+            return math.pi* 3/2 if self.rectangle.y < player_y else math.pi* 1/2
+
+    def move_to_player(self, player_x, player_y):
+    
+        screen.blit(self.sprite, (self.rectangle.x, self.rectangle.y))
+
+        angle = self._get_angle(player_x, player_y) # use the newly created function
+
+        # Calculate movement separately
+        x_movement = self.speed*math.cos(angle)
+        y_movement = self.speed*math.sin(angle)
+
+        # Update x and y position based on player's position
+        self.rectangle.x += x_movement if self.rectangle.x < player_x else -x_movement
+        self.rectangle.y += y_movement if self.rectangle.y < player_y else -y_movement
+
+    def player_collision(self, player_rect): # corrected spelling of function name
         if self.rectangle.colliderect(player_rect):
+            global player_health # consider passing player_health as a parameter rather than using global variable,
             player_health -= self.damage
             print(player_health)
             self.speed = 0
         else:
-            self.speed = self.stored
+            self.speed = self.stored_speed # used the renamed variable
         
 placeholder_enemy = Enemy('placeholder_character.png', 0.5, 6, 1)
 
@@ -109,7 +112,7 @@ while running:
             running = False
     draw_player(player)
     placeholder_enemy.move_to_player(player.x, player.y)
-    placeholder_enemy.player_colision(player)
+    placeholder_enemy.player_collision(player)
     pygame.display.flip()
     clock.tick(60)
 
