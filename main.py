@@ -9,11 +9,17 @@ import random
 import math
 
 pygame.init()
-width, height = 1280, 720
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Vampire Dyers")
+
+# Global variables
 clock = pygame.time.Clock()
 running = True
+
+# Set window title
+pygame.display.set_caption("Vampire Dyers")
+
+# Set screen size
+width, height = 1280, 720
+screen = pygame.display.set_mode((width, height))
 
 # Load the background image
 background_img = pygame.image.load('background.png')
