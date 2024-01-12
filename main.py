@@ -21,12 +21,12 @@ pygame.display.set_caption("Vampire Dyers")
 width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
-# Load the background image
-background_img = pygame.image.load('background.png')
-bg_rect = background_img.get_rect()
-background_pos = [0, 0]   # Initial position of the background
+# Load the floor image
+floor_img = pygame.image.load('floor.png')
+bg_rect = floor_img.get_rect()
+floor_pos = [0, 0]   # Initial position of the floor
 
-# Tile size should match the background image size
+# Tile size should match the floor image size
 tile_size = (bg_rect.width, bg_rect.height)
 
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
@@ -100,14 +100,14 @@ while running:
     if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
         player.y += player_speed  
 
-    # Ensure that the background tiles in all directions by using modulo
-    background_pos[0] %= bg_rect.width
-    background_pos[1] %= bg_rect.height
+    # Ensure that the floor tiles in all directions by using modulo
+    floor_pos[0] %= bg_rect.width
+    floor_pos[1] %= bg_rect.height
 
-    # Draw the tiled background
+    # Draw the tiled floor
     for x in range(-bg_rect.width, screen.get_width(), tile_size[0]):
         for y in range(-bg_rect.height, screen.get_height(), tile_size[1]):
-            screen.blit(background_img, (x + background_pos[0], y + background_pos[1]))
+            screen.blit(floor_img, (x + floor_pos[0], y + floor_pos[1]))
 
     # draws the health bar
     ratio = player_health/total_health
