@@ -24,6 +24,7 @@ screen = pygame.display.set_mode((width, height))
 # Load the floor image
 floor_img = pygame.image.load('floor.png')
 
+# Player code
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
 protagonist = pygame.transform.scale(image, (64, 64))
 def draw_player(player):
