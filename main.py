@@ -3,28 +3,31 @@ import os
 import random
 import math
 
-# === GLOBAL VARIABLES ===
-screen_height = 720
-screen_width = 1280
-running = True
-
 pygame.init()
-screen = pygame.display.set_mode((screen_width, screen_height))
+width, height = 1280, 720
+screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Vampire Dyres")
 clock = pygame.time.Clock()
+running = True
 
 # Load the background image
 background_img = pygame.image.load('background.png')
 bg_rect = background_img.get_rect()
 background_pos = [0, 0]   # Initial position of the background
+
+# Tile size should match the background image size
 tile_size = (bg_rect.width, bg_rect.height)
 
-protagonist = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
+image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
+protagonist = pygame.transform.scale(image, (64, 64))
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
-player = pygame.Rect(640-64, 360-64, 128, 128) #creates a rectangle for the player to check collision
+player = pygame.Rect(640-64, 360-64, 64, 64) #creates a rectangle for the player to check collision
 player_speed = 5
-player_health = 100
+total_health = 100
+
+# Used for health bar
+player_health = total_health
 
 class Enemy: #enemy class code
     def __init__(self, sprite, health, speed, damage): # initialtion 
@@ -32,21 +35,21 @@ class Enemy: #enemy class code
         self.speed = speed
         self.damage = damage
         self.sprite = pygame.image.load(sprite)
-        self.sprite = pygame.transform.scale(self.sprite, (128, 128))
+        self.sprite = pygame.transform.scale(self.sprite, (64, 64))
+        self.stored = self.speed # used to store the speed that was lost after colission
         number = random.randint(1,4)
         if number == 1: #generates in anywhere on the left side
-            self.rectangle = pygame.Rect(0, random.randint(0,720), 128, 128)
+            self.rectangle = pygame.Rect(0, random.randint(0,720), 64, 64)
         if number == 2: #generates in anywhere on the right side
-            self.rectangle = pygame.Rect(1280, random.randint(0,720), 128, 128)
+            self.rectangle = pygame.Rect(1280, random.randint(0,720), 64, 64)
         if number == 3: #generates in anywhere on the top side
-            self.rectangle = pygame.Rect(random.randint(0,1280), 0, 128, 128)
+            self.rectangle = pygame.Rect(random.randint(0,1280), 0, 64, 64)
         if number == 4: #generates in anywhere on the bottom side
-            self.rectangle = pygame.Rect(random.randint(0,1280), 720, 128, 128)
+            self.rectangle = pygame.Rect(random.randint(0,1280), 720, 64, 64)
     def move_to_player(self, player_x, player_y): # moves the player
         screen.blit(self.sprite, (self.rectangle.x, self.rectangle.y))
         try:
             angle = (math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))) #finds the angle between the player and the enemy
-            print(angle)
         except:
             if self.rectangle.y < player_y:
                 angle = math.pi*3/2
@@ -64,10 +67,13 @@ class Enemy: #enemy class code
         global player_health
         if self.rectangle.colliderect(player_rect):
             player_health -= self.damage
-            print("hit")
             print(player_health)
+            self.speed = 0
+        else:
+            self.speed = self.stored
+        
 
-placeholder_enemy = Enemy('placeholder_character.png', 1, 1, 1)
+placeholder_enemy = Enemy('placeholder_character.png', 0.5, 6, 1)
     
 
 while running:
@@ -76,16 +82,12 @@ while running:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
         player.x -= player_speed  
-        print("pressed a")
-    if keys[pygame.K_d] and player.x + player_speed + 128 < 1280:  #replace the 128s with the dimentions of the character
+    if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
         player.x += player_speed  
-        print("pressed d")
     if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
         player.y -= player_speed  
-        print("pressed w")
-    if keys[pygame.K_s] and player.y + player_speed + 128 < 720:  
+    if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
         player.y += player_speed  
-        print("pressed s")
 
     # Ensure that the background tiles in all directions by using modulo
     background_pos[0] %= bg_rect.width
@@ -96,6 +98,13 @@ while running:
         for y in range(-bg_rect.height, screen.get_height(), tile_size[1]):
             screen.blit(background_img, (x + background_pos[0], y + background_pos[1]))
 
+    # draws the health bar
+    ratio = player_health/total_health
+    pygame.draw.rect(screen, "red", (player.x-150+32, player.y+75, 300, 40))
+    if ratio >=0 :
+        pygame.draw.rect(screen, "green", (player.x-150+32, player.y+75, 300*ratio, 40))
+    else:
+        running = False
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
