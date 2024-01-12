@@ -1,3 +1,8 @@
+# Author: Henry Zhao, Benjamin Lu
+# Date: 22nd January 2024
+# Course: ICS3U0-B
+# Description: ADD WHEN DONE ADD WHEN DONE ADD WHEN DONE
+
 import pygame
 import os
 import random
