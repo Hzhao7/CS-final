@@ -23,11 +23,6 @@ screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
 floor_img = pygame.image.load('floor.png')
-bg_rect = floor_img.get_rect()
-floor_pos = [0, 0]   # Initial position of the floor
-
-# Tile size should match the floor image size
-tile_size = (bg_rect.width, bg_rect.height)
 
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
 protagonist = pygame.transform.scale(image, (64, 64))
@@ -83,12 +78,12 @@ class Enemy: #enemy class code
         else:
             self.speed = self.stored
         
-
 placeholder_enemy = Enemy('placeholder_character.png', 0.5, 6, 1)
-    
 
 while running:
-    screen.fill("blue")
+    # Show floor
+    screen.blit(floor_img, (0, 0))
+
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
@@ -99,15 +94,6 @@ while running:
         player.y -= player_speed  
     if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
         player.y += player_speed  
-
-    # Ensure that the floor tiles in all directions by using modulo
-    floor_pos[0] %= bg_rect.width
-    floor_pos[1] %= bg_rect.height
-
-    # Draw the tiled floor
-    for x in range(-bg_rect.width, screen.get_width(), tile_size[0]):
-        for y in range(-bg_rect.height, screen.get_height(), tile_size[1]):
-            screen.blit(floor_img, (x + floor_pos[0], y + floor_pos[1]))
 
     # draws the health bar
     ratio = player_health/total_health
