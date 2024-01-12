@@ -11,7 +11,7 @@ import math
 pygame.init()
 width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Vampire Dyres")
+pygame.display.set_caption("Vampire Dyers")
 clock = pygame.time.Clock()
 running = True
 
