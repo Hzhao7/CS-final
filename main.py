@@ -22,7 +22,7 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('floor.png')
+floor_img = pygame.image.load('CS-final/background.png')
 
 # Player code
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
@@ -35,6 +35,14 @@ total_health = 100
 
 # Used for health bar
 player_health = total_health
+
+#Clock code
+secs = 0
+mins = 0
+
+clock_font = pygame.font.Font('freesansbold.ttf', 32)
+clock_text = clock_font.render("{}:{}".format(mins,secs), True, (255,255,255), (0,0,0))
+text_rect = pygame.Rect(width/2, 50, 1,1)
 
 class Enemy:
     def __init__(self, sprite, health, speed, damage):
@@ -82,11 +90,18 @@ class Enemy:
         else:
             self.speed = self.stored_speed # used the renamed variable
         
-placeholder_enemy = Enemy('placeholder_character.png', 0.5, 6, 1)
-
+placeholder_enemy = Enemy('placeholder_character.png', 0.5, 4, 1)
 while running:
     # Show floor
     screen.blit(floor_img, (0, 0))
+    # shows clock
+    clock.tick(60)
+    secs += 1/60
+    screen.blit(clock_text, text_rect)
+    if secs == 60:
+        secs = 0
+        min += 1
+    clock_text = clock_font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255))
 
     # Event handling for key presses
     keys = pygame.key.get_pressed()
@@ -114,6 +129,6 @@ while running:
     placeholder_enemy.move_to_player(player.x, player.y)
     placeholder_enemy.player_collision(player)
     pygame.display.flip()
-    clock.tick(60)
+    
 
 pygame.quit()
