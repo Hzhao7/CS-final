@@ -98,9 +98,9 @@ while running:
     clock.tick(60)
     secs += 1/60
     screen.blit(clock_text, text_rect)
-    if secs == 60:
+    if int(secs) == 60:
         secs = 0
-        min += 1
+        mins += 1
     clock_text = clock_font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255))
 
     # Event handling for key presses
