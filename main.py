@@ -22,7 +22,7 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('CS-final/background.png')
+floor_img = pygame.image.load('floor.png')
 
 # Player code
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
