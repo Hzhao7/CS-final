@@ -137,7 +137,7 @@ while running:
     # draws the health bar
     ratio = player_health/total_health
     pygame.draw.rect(screen, "red", (player.x-150+32, player.y+75, 300, 40))
-    if ratio >=0 :
+    if ratio > 0 :
         pygame.draw.rect(screen, "green", (player.x-150+32, player.y+75, 300*ratio, 40))
     else:
         running = False
