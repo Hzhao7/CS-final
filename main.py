@@ -22,7 +22,7 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('floor.png')
+floor_img = pygame.image.load('CS-final/floor.png')
 
 # Player code
 image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
@@ -91,6 +91,8 @@ class Enemy:
             self.speed = self.stored_speed # used the renamed variable
         
 placeholder_enemy = Enemy('placeholder_character.png', 0.5, 4, 1)
+placeholder_enemy2 = Enemy('placeholder_character.png', 0.5, 4, 1)
+eneimes = [placeholder_enemy, placeholder_enemy2]
 while running:
     # Show floor
     screen.blit(floor_img, (0, 0))
@@ -126,8 +128,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     draw_player(player)
-    placeholder_enemy.move_to_player(player.x, player.y)
-    placeholder_enemy.player_collision(player)
+    for enemy in eneimes:
+        enemy.move_to_player(player.x, player.y)
+        enemy.player_collision(player)
     pygame.display.flip()
     
 
