@@ -89,11 +89,22 @@ class Enemy:
             self.speed = 0
         else:
             self.speed = self.stored_speed # used the renamed variable
-        
-placeholder_enemy = Enemy('placeholder_character.png', 0.5, 4, 1)
+    def is_dead(self):
+        if self.health <= 0:
+            return True
+        else:
+            return False
+
+enemies = []
+def add_class():        
+    enemies.append(Enemy('placeholder_character.png', 0.5, 4, 1))
+add_class()
+add_class()
 placeholder_enemy2 = Enemy('placeholder_character.png', 0.5, 4, 1)
-eneimes = [placeholder_enemy, placeholder_enemy2]
+
 while running:
+    x_move = 0
+    y_move = 0
     # Show floor
     screen.blit(floor_img, (0, 0))
     # shows clock
@@ -108,13 +119,20 @@ while running:
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
-        player.x -= player_speed  
+        x_move -= player_speed  
     if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
-        player.x += player_speed  
+        x_move += player_speed  
     if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
-        player.y -= player_speed  
+        y_move -= player_speed  
     if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
-        player.y += player_speed  
+        y_move += player_speed  
+    
+    if x_move != 0 and y_move !=0:
+        x_move = x_move*math.sqrt(2)/2
+        y_move = y_move*math.sqrt(2)/2
+
+    player.x += x_move
+    player.y += y_move
 
     # draws the health bar
     ratio = player_health/total_health
@@ -128,10 +146,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     draw_player(player)
-    for enemy in eneimes:
+    for i,enemy in enumerate(enemies):
         enemy.move_to_player(player.x, player.y)
         enemy.player_collision(player)
-    pygame.display.flip()
-    
+        if enemy.is_dead():
+            enemies.pop(i)
 
+    pygame.display.flip()
 pygame.quit()
