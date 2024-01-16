@@ -104,18 +104,19 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (player_x, player_y))
     def get_angle(self, mouse_x, mouse_y): # refactor the calculations of getting an angle into a function for more readability
         try:
-            self.angle = math.atan(abs(mouse_y-self.rect.y)/abs(mouse_x-self.rect.x))%(2*math.pi)
+            self.angle = math.atan2((mouse_y-self.rect.y),(mouse_x-self.rect.x))
         except ZeroDivisionError:
             self.angle = math.pi* 3/2 if self.rect.y < mouse_y else math.pi* 1/2
     def update(self):
-        screen.blit(self.sprite, (self.rect.x, self.rect.y))
+        rotated = pygame.transform.rotate(self.sprite, 360-(self.angle*180/math.pi))
+        screen.blit(rotated, (self.rect.x, self.rect.y))
         print(self.angle)
         x_movement = self.speed*math.cos(self.angle)
         y_movement = self.speed*math.sin(self.angle)
 
         # Update x and y position based on player's position
         self.rect.x += x_movement if self.angle <= math.pi/2 or (self.angle > 3/4*math.pi) else -x_movement
-        self.rect.y += y_movement if self.angle > math.pi else -y_movement  
+        self.rect.y += y_movement if self.angle < math.pi else -y_movement  
 
         if self.rect.x >= width + 100 or self.rect.y >= height + 100 or self.rect.x <= -100 or self.rect.y <= -100:
             self.kill()
