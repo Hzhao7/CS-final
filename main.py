@@ -94,14 +94,40 @@ class Enemy:
             return True
         else:
             return False
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, player_x, player_y):
+        super().__init__()
+        self.sprite = pygame.image.load('CS-final/bullet.png')
+        self.speed = 5
+        self.image = pygame.Surface((50,10))
+        self.image.fill((255,0,0))
+        self.rect = self.image.get_rect(center = (player_x, player_y))
+    def get_angle(self, mouse_x, mouse_y): # refactor the calculations of getting an angle into a function for more readability
+        try:
+            self.angle = math.atan(abs(mouse_y-self.rect.y)/abs(mouse_x-self.rect.x))%(2*math.pi)
+        except ZeroDivisionError:
+            self.angle = math.pi* 3/2 if self.rect.y < mouse_y else math.pi* 1/2
+    def update(self):
+        screen.blit(self.sprite, (self.rect.x, self.rect.y))
+        print(self.angle)
+        x_movement = self.speed*math.cos(self.angle)
+        y_movement = self.speed*math.sin(self.angle)
+
+        # Update x and y position based on player's position
+        self.rect.x += x_movement if self.angle <= math.pi/2 or (self.angle > 3/4*math.pi) else -x_movement
+        self.rect.y += y_movement if self.angle > math.pi else -y_movement  
+
+        if self.rect.x >= width + 100 or self.rect.y >= height + 100 or self.rect.x <= -100 or self.rect.y <= -100:
+            self.kill()
 
 enemies = []
 def add_class():        
-    enemies.append(Enemy('placeholder_character.png', 0.5, 4, 1))
+    enemies.append(Enemy('placeholder_character.png', 0.5, 2, 1))
 add_class()
 add_class()
-placeholder_enemy2 = Enemy('placeholder_character.png', 0.5, 4, 1)
+add_class()
 
+bullets = []
 while running:
     x_move = 0
     y_move = 0
@@ -127,7 +153,7 @@ while running:
     if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
         y_move += player_speed  
     
-    if x_move != 0 and y_move !=0:
+    if x_move != 0 and y_move !=0: 
         x_move = x_move*math.sqrt(2)/2
         y_move = y_move*math.sqrt(2)/2
 
@@ -145,12 +171,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            bullet = Bullet(player.x, player.y)
+            bullet.get_angle(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
+            bullets.append(bullet)
+    for bullet in bullets:
+        bullet.update()
     draw_player(player)
     for i,enemy in enumerate(enemies):
         enemy.move_to_player(player.x, player.y)
         enemy.player_collision(player)
         if enemy.is_dead():
             enemies.pop(i)
-
     pygame.display.flip()
 pygame.quit()
+
