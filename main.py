@@ -22,10 +22,10 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('CS-final/floor.png')
+floor_img = pygame.image.load('floor.png')
 
 # Player code
-image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
+image = pygame.image.load('placeholder_character.png') #loads the protagonist image
 protagonist = pygame.transform.scale(image, (64, 64))
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
@@ -97,7 +97,7 @@ class Enemy:
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
-        self.sprite = pygame.image.load('CS-final/bullet.png')
+        self.sprite = pygame.image.load('bullet.png')
         self.speed = 5
         self.image = pygame.Surface((50,10))
         self.image.fill((255,0,0))
