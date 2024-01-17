@@ -22,11 +22,11 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('floor.png')
+floor_img = pygame.image.load('CS-final/floor.png')
 
 # Player code
-image = pygame.image.load(os.path.join('placeholder_character.png')) #loads the protagonist image
-protagonist = pygame.transform.scale(image, (64, 64))
+image = pygame.image.load(os.path.join('CS-final/player_left.png')) #loads the protagonist image
+
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 64, 64) #creates a rectangle for the player to check collision
@@ -35,6 +35,9 @@ total_health = 100
 
 # Used for health bar
 player_health = total_health
+
+# Used to store player orientation
+left = True 
 
 #Clock code
 secs = 0
@@ -67,13 +70,13 @@ class Enemy:
         try:
             return math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))
         except ZeroDivisionError:
-            return math.pi* 3/2 if self.rectangle.y < player_y else math.pi* 1/2
+            return math.pi* 3/2 if self.rectangle.y < player_y else math.pi* 1/2 # eliminates the crash where they share the same x coordinate
 
     def move_to_player(self, player_x, player_y):
-    
-        screen.blit(self.sprite, (self.rectangle.x, self.rectangle.y))
-
         angle = self._get_angle(player_x, player_y) # use the newly created function
+
+        rotated = pygame.transform.rotate(self.sprite, 360-(angle*180/math.pi))
+        screen.blit(rotated, (self.rectangle.x, self.rectangle.y))
 
         # Calculate movement separately
         x_movement = self.speed*math.cos(angle)
@@ -102,21 +105,26 @@ class Enemy:
         else:
             return False
     
+# bullet class code
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
-        self.sprite = pygame.image.load('bullet.png')
+        self.sprite = pygame.image.load('CS-final/bullet.png')
         self.speed = 15
         self.image = pygame.Surface((50,10))
-        self.image.fill((255,0,0))
-        self.rect = self.image.get_rect(center = (player_x, player_y))
+        self.image.fill((0,0,0))
+        global left # tracks if the player is oriented left or right and using that it will change the bullet spawn position
+        if left:
+            self.rect = self.image.get_rect(center = (player_x, player_y))
+        else:
+            self.rect = self.image.get_rect(center = (player_x+64, player_y))
     def get_angle(self, mouse_x, mouse_y): # refactor the calculations of getting an angle into a function for more readability
         try:
             self.angle = math.atan2((mouse_y-self.rect.y),(mouse_x-self.rect.x))
         except ZeroDivisionError:
             self.angle = math.pi* 3/2 if self.rect.y < mouse_y else math.pi* 1/2
     def update(self):
-        rotated = pygame.transform.rotate(self.sprite, 360-(self.angle*180/math.pi))
+        rotated = pygame.transform.rotate(self.sprite, 360-(self.angle*180/math.pi)) # finds the angle it needs to rotate
         screen.blit(rotated, (self.rect.x, self.rect.y))
         x_movement = self.speed*math.cos(self.angle)
         y_movement = self.speed*math.sin(self.angle)
@@ -128,7 +136,7 @@ class Bullet(pygame.sprite.Sprite):
 
 enemies = []
 def minion(): 
-    enemies.append(Enemy('placeholder_character.png', 10, 4, 0.5))
+    enemies.append(Enemy('CS-final/player_left.png', 10, 4, 0.5))
 def boss():
     enemies.append(Enemy('placeholder_character.png', 100, 2, 1))
 
@@ -152,13 +160,18 @@ while running:
         minion()
     if frame % (60*5) == 0:
         boss()
+    protagonist = pygame.transform.scale(image, (64, 66)) 
 
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
         x_move -= player_speed  
+        image = pygame.image.load(os.path.join('CS-final/player_left.png'))
+        left = True
     if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
         x_move += player_speed  
+        image = pygame.image.load(os.path.join('CS-final/player_right.png'))
+        left = False
     if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
         y_move -= player_speed  
     if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
