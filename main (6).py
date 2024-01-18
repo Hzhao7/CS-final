@@ -178,11 +178,11 @@ while running:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
         x_move -= player_speed  
-        image = pygame.image.load(os.path.join('CS-final/player_left.png'))
+        image = pygame.image.load(os.path.join('player_left.png'))
         left = True
     if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
         x_move += player_speed  
-        image = pygame.image.load(os.path.join('CS-final/player_right.png'))
+        image = pygame.image.load(os.path.join('player_right.png'))
         left = False
     if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
         y_move -= player_speed  
