@@ -30,7 +30,7 @@ image = pygame.image.load(os.path.join('player_left.png')) #loads the protagonis
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 64, 64) #creates a rectangle for the player to check collision
-player_speed = 5
+player_speed = 2.5
 total_health = 100
 
 # Used for health bar
@@ -43,8 +43,8 @@ left = True
 secs = 0
 mins = 0
 
-clock_font = pygame.font.Font('freesansbold.ttf', 32)
-clock_text = clock_font.render("{}:{}".format(mins,secs), True, (255,255,255), (0,0,0))
+font = pygame.font.Font('freesansbold.ttf', 32)
+clock_text = font.render("{}:{}".format(mins,secs), True, (255,255,255), (0,0,0))
 text_rect = pygame.Rect(width/2, 50, 1,1)
 
 bullet_damage = 5
@@ -107,11 +107,12 @@ class Enemy:
             return False
     
 # bullet class code
+bullet_speed = 10
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
         self.sprite = pygame.image.load('bullet.png')
-        self.speed = 15
+        self.speed = bullet_speed
         self.image = pygame.Surface((50,10))
         self.image.fill((0,0,0))
         global left # tracks if the player is oriented left or right and using that it will change the bullet spawn position
@@ -125,7 +126,6 @@ class Bullet(pygame.sprite.Sprite):
         except ZeroDivisionError:
             self.angle = math.pi* 3/2 if self.rect.y < mouse_y else math.pi* 1/2
     def update(self):
-        print(self.angle)
         rotated = pygame.transform.rotate(self.sprite, 360-(self.angle*180/math.pi)) # finds the angle it needs to rotate
         screen.blit(rotated, (self.rect.x, self.rect.y))
         x_movement = self.speed*math.cos(self.angle)
@@ -144,8 +144,33 @@ def spawn_vampire():
 def spawn_vampire_boss():
     enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
 
+# upgrades 
+damage_upgrade_tracker = pygame.image.load('damage_upgrade_tracker.png')
+damage_upgrades = 0
+health_upgrade_tracker = pygame.image.load('health_upgrade_tracker.png')
+health_upgrades = 0
+speed_upgrade_tracker = pygame.image.load('speed_upgrade_tracker.png')
+speed_upgrades = 0
+upgrades = 0
+upgrade_text_box = pygame.Rect(15, height-160, 1, 1)
+def draw_upgrade(text, block_height, upgrades):
+    font = pygame.font.Font('freesansbold.ttf', 14)
+    upgrade_text = font.render(text, True, (255,255,255))
+    text_rect = pygame.Rect(15, block_height, 1,1)
+    pygame.draw.rect(screen, "black", (15, block_height, 300, 24))
+    if text == "Damage [1]":
+        upgrade_tracker = damage_upgrade_tracker
+    elif text == "Health [2]":
+        upgrade_tracker = health_upgrade_tracker
+    elif text == "Speed  [3]":
+        upgrade_tracker = speed_upgrade_tracker
+    for n in range(upgrades):
+        screen.blit(upgrade_tracker, (18.5+50*n, block_height))
+    screen.blit(upgrade_text, (text_rect.x, text_rect.y))
+
 bullets = []
 frame = 0
+spawn_factor = 60 # controls how fast they spawn
 while running:
     x_move = 0
     y_move = 0
@@ -159,10 +184,9 @@ while running:
     if int(secs) == 60:
         secs = 0
         mins += 1
-    clock_text = clock_font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255)) # clock rendering
+    clock_text = font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255)) # clock rendering
 
     # enemy spawning
-    spawn_factor = 60 # controls how fast they spawn
     if frame % spawn_factor == 0:
         spawn_bat()
     if frame % (spawn_factor*5) == 0:
@@ -170,11 +194,16 @@ while running:
     if frame % (spawn_factor*15) == 0:
         spawn_vampire_boss()
     
-    # every minute the enemies will spawn 25% faster
-    if frame % (600) == 0:
-        spawn_factor = spawn_factor*0.75
-    protagonist = pygame.transform.scale(image, (64, 66)) 
-
+    # every minute the enemies will spawn 50% faster 
+    if frame % (3600) == 0:
+        spawn_factor = spawn_factor*0.5
+    # every 15 seconds you get an upgrade, if the player is already maxed it heals the player to full
+    if frame % (900) == 0:
+        if (speed_upgrades+health_upgrades+damage_upgrades) == 18:
+            player_health = total_health
+        else:
+            upgrades += 1
+    protagonist = pygame.transform.scale(image, (64, 66))  
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
@@ -204,6 +233,12 @@ while running:
         pygame.draw.rect(screen, "green", (player.x-150+32, player.y+75, 300*ratio, 40))
     else:
         running = False
+    #draws upgrades
+    upgrade_text = font.render("Number of upgrades x{}".format(upgrades), True, (0,0,0))
+    screen.blit(upgrade_text, (upgrade_text_box.x, upgrade_text_box.y))
+    draw_upgrade("Damage [1]", height-96, damage_upgrades)
+    draw_upgrade("Health [2]", height-64, health_upgrades)
+    draw_upgrade("Speed  [3]", height-32, speed_upgrades)
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -212,6 +247,24 @@ while running:
             bullet = Bullet(player.x, player.y)
             bullet.get_angle(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
             bullets.append(bullet)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                if upgrades > 0 and damage_upgrades < 6:
+                    damage_upgrades += 1
+                    upgrades -= 1
+                    bullet_damage += 5
+            if event.key == pygame.K_2 and health_upgrades < 6:
+                if upgrades > 0:
+                    health_upgrades += 1
+                    upgrades -= 1
+                    total_health += 100
+                    player_health = total_health  
+            if event.key == pygame.K_3 and speed_upgrades < 6:
+                if upgrades > 0:
+                    speed_upgrades += 1
+                    upgrades -= 1
+                    player_speed += 2.5
+                    bullet_speed += 5              
     for i,bullet in enumerate(bullets):
         bullet.update()
         if bullet.rect.x >= width + 100 or bullet.rect.y >= height + 100 or bullet.rect.x <= -100 or bullet.rect.y <= -100:
