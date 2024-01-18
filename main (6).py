@@ -22,10 +22,10 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 
 # Load the floor image
-floor_img = pygame.image.load('CS-final/floor.png')
+floor_img = pygame.image.load('floor.png')
 
 # Player code
-image = pygame.image.load(os.path.join('CS-final/player_left.png')) #loads the protagonist image
+image = pygame.image.load(os.path.join('player_left.png')) #loads the protagonist image
 
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
@@ -47,14 +47,16 @@ clock_font = pygame.font.Font('freesansbold.ttf', 32)
 clock_text = clock_font.render("{}:{}".format(mins,secs), True, (255,255,255), (0,0,0))
 text_rect = pygame.Rect(width/2, 50, 1,1)
 
-bullet_damage = 1
+bullet_damage = 5
 
 class Enemy:
-    def __init__(self, sprite, health, speed, damage):
+    def __init__(self, sprite, sprite_width, sprite_height, health, speed, damage):
         self.health = health
         self.speed = speed
         self.damage = damage
-        self.sprite = pygame.transform.scale(pygame.image.load(sprite), (64, 64)) # Combined two operations into one
+        self.sprite_width = sprite_width
+        self.sprite_height = sprite_height
+        self.sprite = pygame.transform.scale(pygame.image.load(sprite), (self.sprite_width, self.sprite_height)) # Combined two operations into one
         self.stored_speed = speed # renamed stored variable to stored_speed to be more descriptive.
 
         position_options = [ #Array of position options. Reduces repetitive code and allows for easy additions
@@ -74,7 +76,6 @@ class Enemy:
 
     def move_to_player(self, player_x, player_y):
         angle = self._get_angle(player_x, player_y) # use the newly created function
-
         rotated = pygame.transform.rotate(self.sprite, 360-(angle*180/math.pi))
         screen.blit(rotated, (self.rectangle.x, self.rectangle.y))
 
@@ -97,7 +98,7 @@ class Enemy:
         self.health -= damage
         damage_font = pygame.font.Font('freesansbold.ttf', 32)
         damage_text = damage_font.render("{}".format(damage), True, (255,255,255), (0,0,0))
-        text_rect = pygame.Rect(self.rectangle.x, self.rectangle.y-10, 1,1)
+        text_rect = pygame.Rect(self.rectangle.x+self.sprite_width/2, self.rectangle.y-25, 1,1)
         screen.blit(damage_text,text_rect)
     def is_dead(self):
         if self.health <= 0:
@@ -109,7 +110,7 @@ class Enemy:
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
-        self.sprite = pygame.image.load('CS-final/bullet.png')
+        self.sprite = pygame.image.load('bullet.png')
         self.speed = 15
         self.image = pygame.Surface((50,10))
         self.image.fill((0,0,0))
@@ -135,10 +136,12 @@ class Bullet(pygame.sprite.Sprite):
 
 
 enemies = []
-def minion(): 
-    enemies.append(Enemy('CS-final/player_left.png', 10, 4, 0.5))
-def boss():
-    enemies.append(Enemy('placeholder_character.png', 100, 2, 1))
+def spawn_bat(): 
+    enemies.append(Enemy('bat.png', 64, 64, 10, 4, 0.5))
+def spawn_vampire():
+    enemies.append(Enemy('Vampire.png', 64, 90, 100, 2, 1))
+def spawn_vampire_boss():
+    enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
 
 bullets = []
 frame = 0
@@ -155,11 +158,20 @@ while running:
     if int(secs) == 60:
         secs = 0
         mins += 1
-    clock_text = clock_font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255))
-    if frame % 60 == 0:
-        minion()
-    if frame % (60*5) == 0:
-        boss()
+    clock_text = clock_font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255)) # clock rendering
+
+    # enemy spawning
+    spawn_factor = 60 # controls how fast they spawn
+    if frame % spawn_factor == 0:
+        spawn_bat()
+    if frame % (spawn_factor*5) == 0:
+        spawn_vampire()
+    if frame % (spawn_factor*15) == 0:
+        spawn_vampire_boss()
+    
+    # every minute the enemies will spawn 25% faster
+    if frame % (3600) == 0:
+        spawn_factor = spawn_factor*0.75
     protagonist = pygame.transform.scale(image, (64, 66)) 
 
     # Event handling for key presses
@@ -207,9 +219,9 @@ while running:
             if bullet.rect.colliderect(enemy.rectangle):
                 try:
                     bullets.pop(i)
-                except IndexError:
+                except IndexError: # there is a thing that crashes if you are hit and shooting and this catches it
                     continue
-                enemy.take_damage(5)
+                enemy.take_damage(bullet_damage)
     for i,enemy in enumerate(enemies):
         enemy.move_to_player(player.x, player.y)
         enemy.player_collision(player)
