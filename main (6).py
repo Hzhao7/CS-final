@@ -125,13 +125,14 @@ class Bullet(pygame.sprite.Sprite):
         except ZeroDivisionError:
             self.angle = math.pi* 3/2 if self.rect.y < mouse_y else math.pi* 1/2
     def update(self):
+        print(self.angle)
         rotated = pygame.transform.rotate(self.sprite, 360-(self.angle*180/math.pi)) # finds the angle it needs to rotate
         screen.blit(rotated, (self.rect.x, self.rect.y))
         x_movement = self.speed*math.cos(self.angle)
         y_movement = self.speed*math.sin(self.angle)
 
         # Update x and y position based on player's position
-        self.rect.x += x_movement if self.angle <= math.pi/2 or (self.angle > 3/4*math.pi) else -x_movement
+        self.rect.x += x_movement if self.angle < math.pi/2 or (self.angle > 1/2*math.pi) else -x_movement
         self.rect.y += y_movement if self.angle < math.pi else -y_movement  
 
 
@@ -170,7 +171,7 @@ while running:
         spawn_vampire_boss()
     
     # every minute the enemies will spawn 25% faster
-    if frame % (3600) == 0:
+    if frame % (600) == 0:
         spawn_factor = spawn_factor*0.75
     protagonist = pygame.transform.scale(image, (64, 66)) 
 
