@@ -27,6 +27,11 @@ floor_img = pygame.image.load('floor.png')
 # Player code
 image = pygame.image.load(os.path.join('player_left.png')) #loads the protagonist image
 
+# reticle
+reticle = pygame.image.load('reticle.png')
+reticle_rect = pygame.Rect(width/2, height/2, 1, 1)
+pygame.mouse.set_visible(False)
+
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 64, 64) #creates a rectangle for the player to check collision
@@ -239,6 +244,7 @@ while running:
     draw_upgrade("Damage [1]", height-96, damage_upgrades)
     draw_upgrade("Health [2]", height-64, health_upgrades)
     draw_upgrade("Speed  [3]", height-32, speed_upgrades)
+
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -281,6 +287,10 @@ while running:
         enemy.player_collision(player)
         if enemy.is_dead():
             enemies.pop(i)
+
+    #reticle code
+    reticle_rect.center = pygame.mouse.get_pos()
+    screen.blit(reticle, (reticle_rect.x-24, reticle_rect.y-24))
     pygame.display.flip()
 pygame.quit()
 
