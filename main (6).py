@@ -25,31 +25,122 @@ screen = pygame.display.set_mode((width, height))
 # Main Menu
 menu = True
 difficulty = "easy"
-menu_image = pygame.image.load('menu_background.jpg')
-menu_play_button_default = pygame.image.load('menu_play_button_default.png')
-menu_play_button_hover = pygame.image.load('menu_play_button_hover.png')
-menu_play_button_click = pygame.image.load('menu_play_button_click.png')
-menu_instructions_button_default = pygame.image.load('menu_instructions_button_default.png')
-menu_instructions_button_hover = pygame.image.load('menu_instructions_button_hover.png')
-menu_instructions_button_click = pygame.image.load('menu_instructions_button_click.png')
-menu_difficulty_easy_button_default = pygame.image.load('menu_difficulty_easy_button_default.png')
-menu_difficulty_easy_button_hover = pygame.image.load('menu_difficulty_easy_button_hover.png')
-menu_difficulty_easy_button_click = pygame.image.load('menu_difficulty_easy_button_click.png')
-menu_difficulty_medium_button_default = pygame.image.load('menu_difficulty_medium_button_default.png')
-menu_difficulty_medium_button_hover = pygame.image.load('menu_difficulty_medium_button_hover.png')
-menu_difficulty_medium_button_click = pygame.image.load('menu_difficulty_medium_button_click.png')
-menu_difficulty_hard_button_default = pygame.image.load('menu_difficulty_hard_button_default.png')
-menu_difficulty_hard_button_hover = pygame.image.load('menu_difficulty_hard_button_hover.png')
-menu_difficulty_hard_button_click = pygame.image.load('menu_difficulty_hard_button_click.png')
+try:
+    menu_image = pygame.image.load('menu_background.jpg')
+except:
+    print("[DEBUG] Unable to locate menu_background.jpg file")
+    menu_image = pygame.image.load('missing_asset.png')
+
+try:
+    menu_play_button_default = pygame.image.load('menu_play_button_default.png')
+except:
+    print("[DEBUG] Unable to locate menu_play_button_default.png file")
+    menu_play_button_default = pygame.image.load('missing_asset.png')
+
+try:
+    menu_play_button_hover = pygame.image.load('menu_play_button_hover.png')
+except:
+    print("[DEBUG] Unable to locate menu_play_button_hover.png file")
+    menu_play_button_hover = pygame.image.load('missing_asset.png')
+
+try:
+    menu_play_button_click = pygame.image.load('menu_play_button_click.png')
+except:
+    print("[DEBUG] Unable to locate menu_play_button_click.png file")
+    menu_play_button_click = pygame.image.load('missing_asset.png')
+
+try:
+    menu_instructions_button_default = pygame.image.load('menu_instructions_button_default.png')
+except:
+    print("[DEBUG] Unable to locate menu_instructions_button_default.png file")
+    menu_instructions_button_default = pygame.image.load('missing_asset.png')
+
+try:
+    menu_instructions_button_hover = pygame.image.load('menu_instructions_button_hover.png')
+except:
+    print("[DEBUG] Unable to locate menu_instructions_button_hover.png file")
+    menu_instructions_button_hover = pygame.image.load('missing_asset.png')
+
+try:
+    menu_instructions_button_click = pygame.image.load('menu_instructions_button_click.png')
+except:
+    print("[DEBUG] Unable to locate menu_instructions_button_click.png file")
+    menu_instructions_button_click = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_easy_button_default = pygame.image.load('menu_difficulty_easy_button_default.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_easy_button_default.png file")
+    menu_difficulty_easy_button_default = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_easy_button_hover = pygame.image.load('menu_difficulty_easy_button_hover.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_easy_button_hover.png file")
+    menu_difficulty_easy_button_hover = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_easy_button_click = pygame.image.load('menu_difficulty_easy_button_click.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_easy_button_click.png file")
+    menu_difficulty_easy_button_click = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_medium_button_default = pygame.image.load('menu_difficulty_medium_button_default.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_medium_button_default.png file")
+    menu_difficulty_medium_button_default = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_medium_button_hover = pygame.image.load('menu_difficulty_medium_button_hover.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_medium_button_hover.png file")
+    menu_difficulty_medium_button_hover = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_medium_button_click = pygame.image.load('menu_difficulty_medium_button_click.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_medium_button_click.png file")
+    menu_difficulty_medium_button_click = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_hard_button_default = pygame.image.load('menu_difficulty_hard_button_default.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_hard_button_default.png file")
+    menu_difficulty_hard_button_default = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_hard_button_hover = pygame.image.load('menu_difficulty_hard_button_hover.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_hard_button_hover.png file")
+    menu_difficulty_hard_button_hover = pygame.image.load('missing_asset.png')
+
+try:
+    menu_difficulty_hard_button_click = pygame.image.load('menu_difficulty_hard_button_click.png')
+except:
+    print("[DEBUG] Unable to locate menu_difficulty_hard_button_click.png file")
+    menu_difficulty_hard_button_click = pygame.image.load('missing_asset.png')
 
 # Load the floor image
-floor_img = pygame.image.load('floor.png')
+try:
+    floor_img = pygame.image.load('floor.png')
+except:
+    print("[DEBUG] Unable to locate floor.png file")
+    floor_img = pygame.image.load('missing_asset.png')
 
 # Player code
-image = pygame.image.load(os.path.join('player_left.png')) #loads the protagonist image
+try:
+    image = pygame.image.load('player_left.png') #loads the protagonist image
+except:
+    print("[DEBUG] Unable to locate player_left.png file")
+    image = pygame.image.load("missing_asset.png")
 
 # reticle
-reticle = pygame.image.load('reticle.png')
+try:
+    reticle = pygame.image.load('reticle.png')
+except:
+    print("[DEBUG] Unable to locate reticle.png file")
+    reticle = pygame.image.load("missing_asset.png")
 reticle_rect = pygame.Rect(width/2, height/2, 1, 1)
 pygame.mouse.set_visible(False)
 
@@ -137,7 +228,11 @@ bullet_speed = 10
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
-        self.sprite = pygame.image.load('bullet.png')
+        try:
+            self.sprite = pygame.image.load('bullet.png')
+        except:
+            print("[DEBUG] Unable to locate bullet.png file")
+            self.sprite = pygame.image.load("missing_asset.png")
         self.speed = bullet_speed
         self.image = pygame.Surface((50,10))
         self.image.fill((0,0,0))
@@ -171,11 +266,23 @@ def spawn_vampire_boss():
     enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
 
 # upgrades 
-damage_upgrade_tracker = pygame.image.load('damage_upgrade_tracker.png')
+try:
+    damage_upgrade_tracker = pygame.image.load('damage_upgrade_tracker.png')
+except:
+    print("[DEBUG] Unable to locate damage_upgrade_tracker.png file")
+    damage_upgrade_tracker = pygame.image.load("missing_asset.png")
 damage_upgrades = 0
-health_upgrade_tracker = pygame.image.load('health_upgrade_tracker.png')
+try:
+    health_upgrade_tracker = pygame.image.load('health_upgrade_tracker.png')
+except:
+    print("[DEBUG] Unable to locate health_upgrade_tracker.png file")
+    health_upgrade_tracker = pygame.image.load("missing_asset.png")
 health_upgrades = 0
-speed_upgrade_tracker = pygame.image.load('speed_upgrade_tracker.png')
+try:
+    speed_upgrade_tracker = pygame.image.load('speed_upgrade_tracker.png')
+except:
+    print("[DEBUG] Unable to locate speed_upgrade_tracker.png file")
+    speed_upgrade_tracker = pygame.image.load("missing_asset.png")
 speed_upgrades = 0
 upgrades = 0
 upgrade_text_box = pygame.Rect(15, height-160, 1, 1)
@@ -234,12 +341,20 @@ while running:
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
-        x_move -= player_speed  
-        image = pygame.image.load(os.path.join('player_left.png'))
+        x_move -= player_speed
+        try:
+            image = pygame.image.load('player_left.png')
+        except:
+            print("[DEBUG] Unable to locate player_left.png file")
+            image = pygame.image.load("missing_asset.png")
         left = True
     if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
-        x_move += player_speed  
-        image = pygame.image.load(os.path.join('player_right.png'))
+        x_move += player_speed
+        try:
+            image = pygame.image.load('player_right.png')
+        except:
+            print("[DEBUG] Unable to locate player_right.png file")
+            image = pygame.image.load("missing_asset.png")
         left = False
     if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
         y_move -= player_speed  
