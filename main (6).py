@@ -4,7 +4,6 @@
 # Description: ADD WHEN DONE ADD WHEN DONE ADD WHEN DONE
 
 import pygame
-import os
 import random
 import math
 
@@ -25,6 +24,7 @@ screen = pygame.display.set_mode((width, height))
 # Main Menu
 menu = True
 difficulty = "easy"
+difficulty_factor = 2
 instructions = False
 try:
     menu_image = pygame.image.load('menu_background.jpg')
@@ -166,13 +166,18 @@ left = True
 #Clock code
 secs = 0
 mins = 0
-
+frame = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 clock_text = font.render("{}:{}".format(mins,secs), True, (255,255,255), (0,0,0))
 text_rect = pygame.Rect(width/2, 50, 1,1)
 
-bullet_damage = 5
+# High score code
+high_score = open("highscore.txt", "r")
+highscore_lines = high_score.readlines()
+highscore_text = font.render("Highscore: {}:{}".format(highscore_lines[0].strip(), int(float(highscore_lines[1]))), True, (0,0,0))
+highscore_rect = pygame.Rect(0, 0, 1, 1)
 
+# Enemy Class code
 class Enemy:
     def __init__(self, sprite, sprite_width, sprite_height, health, speed, damage):
         self.health = health
@@ -229,9 +234,20 @@ class Enemy:
             return True
         else:
             return False
+        
+# enemy spawning
+enemies = []
+def spawn_bat(): 
+    enemies.append(Enemy('bat.png', 64, 64, 10, 4, 0.5))
+def spawn_vampire():
+    enemies.append(Enemy('Vampire.png', 64, 90, 100, 2, 1))
+def spawn_vampire_boss():
+    enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
     
 # bullet class code
+bullet_damage = 5
 bullet_speed = 10
+bullets = []
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_x, player_y):
         super().__init__()
@@ -262,15 +278,6 @@ class Bullet(pygame.sprite.Sprite):
         # Update x and y position based on player's position
         self.rect.x += x_movement if self.angle < math.pi/2 or (self.angle > 1/2*math.pi) else -x_movement
         self.rect.y += y_movement if self.angle < math.pi else -y_movement  
-
-
-enemies = []
-def spawn_bat(): 
-    enemies.append(Enemy('bat.png', 64, 64, 10, 4, 0.5))
-def spawn_vampire():
-    enemies.append(Enemy('Vampire.png', 64, 90, 100, 2, 1))
-def spawn_vampire_boss():
-    enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
 
 # upgrades 
 try:
@@ -308,17 +315,22 @@ def draw_upgrade(text, block_height, upgrades):
         screen.blit(upgrade_tracker, (18.5+50*n, block_height))
     screen.blit(upgrade_text, (text_rect.x, text_rect.y))
 
-bullets = []
-frame = 0
+
+
 spawn_factor = 60 # controls how fast they spawn
 while running:
+    #sets to 60 fps
+    clock.tick(60)
+    # gets mouse coordinates
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    # stores player movement
     x_move = 0
     y_move = 0
+    # reshapes the image of the player
+    protagonist = pygame.transform.scale(image, (64, 66))
     # Show floor
     screen.blit(floor_img, (0, 0))
-    # shows clock
-    clock.tick(60)
+    # Show clock
     frame += 1
     secs += 1/60
     screen.blit(clock_text, text_rect)
@@ -326,6 +338,8 @@ while running:
         secs = 0
         mins += 1
     clock_text = font.render("{}:{}".format(int(mins),int(secs)), True, (0,0,0), (255,255,255)) # clock rendering
+    # Show Highscore
+    screen.blit(highscore_text, highscore_rect)
 
     # enemy spawning
     if frame % spawn_factor == 0:
@@ -337,14 +351,16 @@ while running:
     
     # every minute the enemies will spawn 50% faster 
     if frame % (3600) == 0:
-        spawn_factor = spawn_factor*0.5
+        if difficulty_factor == 0.5: # if the difficulty is hard, the spawn rate increase each minute will double
+            spawn_factor = spawn_factor*0.5*difficulty_factor
+        else:
+            spawn_factor = spawn_factor*0.5
     # every 15 seconds you get an upgrade, if the player is already maxed it heals the player to full
-    if frame % (900) == 0:
+    if frame % (900/difficulty_factor) == 0:
         if (speed_upgrades+health_upgrades+damage_upgrades) == 18:
             player_health = total_health
         else:
-            upgrades += 1
-    protagonist = pygame.transform.scale(image, (64, 66))  
+            upgrades += 1  
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
@@ -355,7 +371,7 @@ while running:
             print("[DEBUG] Unable to locate player_left.png file")
             image = pygame.image.load("missing_asset.png")
         left = True
-    if keys[pygame.K_d] and player.x + player_speed + 128 < width:  #replace the 128s with the dimentions of the character
+    if keys[pygame.K_d] and player.x + player_speed + 64 < width:  
         x_move += player_speed
         try:
             image = pygame.image.load('player_right.png')
@@ -363,9 +379,9 @@ while running:
             print("[DEBUG] Unable to locate player_right.png file")
             image = pygame.image.load("missing_asset.png")
         left = False
-    if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up yo need to subtract
+    if keys[pygame.K_w] and player.y - player_speed > 0:  # (0,0) is the top corner so to move up you need to subtract
         y_move -= player_speed  
-    if keys[pygame.K_s] and player.y + player_speed + 128 < height:  
+    if keys[pygame.K_s] and player.y + player_speed + 66 < height:  
         y_move += player_speed  
     
     if x_move != 0 and y_move !=0: 
@@ -407,10 +423,13 @@ while running:
                     match difficulty:
                         case "easy":
                             difficulty = "medium"
+                            difficulty_factor = 1
                         case "medium":
                             difficulty = "hard"
+                            difficulty_factor = 0.5
                         case "hard":
                             difficulty = "easy"
+                            difficulty_factor = 2
 
                 elif instructions_button_area.collidepoint((mouse_x, mouse_y)):
                     print("Clicked instructions")
@@ -428,19 +447,19 @@ while running:
                 if upgrades > 0 and damage_upgrades < 6:
                     damage_upgrades += 1
                     upgrades -= 1
-                    bullet_damage += 5
+                    bullet_damage += 5*difficulty_factor
             if event.key == pygame.K_2 and health_upgrades < 6:
                 if upgrades > 0:
                     health_upgrades += 1
                     upgrades -= 1
-                    total_health += 100
+                    total_health += 100*difficulty_factor
                     player_health = total_health  
             if event.key == pygame.K_3 and speed_upgrades < 6:
                 if upgrades > 0:
                     speed_upgrades += 1
                     upgrades -= 1
-                    player_speed += 2.5
-                    bullet_speed += 5              
+                    player_speed += 2.5*difficulty_factor
+                    bullet_speed += 5*difficulty_factor              
     for i,bullet in enumerate(bullets):
         bullet.update()
         if bullet.rect.x >= width + 100 or bullet.rect.y >= height + 100 or bullet.rect.x <= -100 or bullet.rect.y <= -100:
@@ -517,4 +536,12 @@ while running:
             'hard': {'default': menu_difficulty_hard_button_default, 'hover': menu_difficulty_hard_button_hover, 'click': menu_difficulty_hard_button_click, 'next': 'easy'}
         }
     pygame.display.flip()
+
+# record down the high score before quitting
+if mins >= int(highscore_lines[0].strip()) and secs > int(highscore_lines[1].strip()):
+    print("true")
+    L = [f'{mins}\n', f'{secs}']
+    high_score = open("highscore.txt", "w")
+    high_score.writelines(L)
+    high_score.close()
 pygame.quit()
