@@ -25,11 +25,18 @@ screen = pygame.display.set_mode((width, height))
 # Main Menu
 menu = True
 difficulty = "easy"
+instructions = False
 try:
     menu_image = pygame.image.load('menu_background.jpg')
 except:
     print("[DEBUG] Unable to locate menu_background.jpg file")
     menu_image = pygame.image.load('missing_asset.png')
+
+try:
+    instructions_background = pygame.image.load('instructions_background.jpg')
+except:
+    print("[DEBUG] Unable to locate instructions_background.jpg file")
+    instructions_background = pygame.image.load('missing_asset.png')
 
 try:
     menu_play_button_default = pygame.image.load('menu_play_button_default.png')
@@ -388,6 +395,29 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_button_down = True
+            # ===================================================
+            if menu and not instructions:
+                if play_button_area.collidepoint((mouse_x, mouse_y)):
+                    print("Clicked play")
+                    menu = False
+
+                elif difficulty_button_area.collidepoint((mouse_x, mouse_y)):
+                    print("Clicked difficulty")
+                    print(difficulty)
+                    match difficulty:
+                        case "easy":
+                            difficulty = "medium"
+                        case "medium":
+                            difficulty = "hard"
+                        case "hard":
+                            difficulty = "easy"
+
+                elif instructions_button_area.collidepoint((mouse_x, mouse_y)):
+                    print("Clicked instructions")
+                    instructions = True
+            elif instructions and mouse_x < 150 and mouse_y < 100:
+                instructions = False
+            # ===================================================
             bullet = Bullet(player.x, player.y)
             bullet.get_angle(mouse_x,mouse_y)
             bullets.append(bullet)
@@ -447,76 +477,44 @@ while running:
         difficulty_button_area = pygame.Rect(500, 475, 291, 64)
         instructions_button_area = pygame.Rect(500, 575, 291, 64)
 
-        # Define a function to handle button interactions
-        # This function checks a click condition and updates the button display
-        # It also manages the mouse button press state to avoid continuous clicks while the button is pressed
-        def handle_button(button_area, default_img, hover_img, click_img, click_condition):
-            # Use global to modify the variable outside of the function
-            global mouse_button_was_pressed
-            button_clicked = False  # Initialize button clicked status as False
-            # Get the state of the mouse button, 1 if pressed, 0 otherwise
-            mouse_button_pressed = pygame.mouse.get_pressed()[0]
-            
-            # Check if the mouse is over the button area
-            if button_area.collidepoint(mouse_pos):
-                # If the mouse button is pressed and the click condition is True
-                if mouse_button_pressed and click_condition:
-                    # Ensure that the button is pressed for the first time
-                    if not mouse_button_was_pressed:
-                        # If true, change the button to the clicked image and set the button as clicked
-                        screen.blit(click_img, button_area.topleft)
-                        button_clicked = True
-                        mouse_button_was_pressed = True
-                    else:
-                        # If the button was already pressed, just display the hover image
-                        screen.blit(hover_img, button_area.topleft)
-                else:
-                    # If the mouse button is not pressed, simply show the hover image
-                    screen.blit(hover_img, button_area.topleft)
+        # Do not display buttons if in instructions page
+        if not instructions:
+            # Display play button
+            if play_button_area.collidepoint((mouse_x, mouse_y)):
+                screen.blit(menu_play_button_hover, play_button_area)
             else:
-                # If the mouse is not over the button, display the default button image
-                screen.blit(default_img, button_area.topleft)
-            
-            # Reset the mouse button press state if the mouse button is not pressed
-            if not mouse_button_pressed:
-                mouse_button_was_pressed = False
-            return button_clicked
-
-        # Define a function to change difficulty levels
-        def change_difficulty():
-            global difficulty
-            # Circulate through the list of difficulties
-            difficulty = difficulty_dict[difficulty]['next']
-
-        # Get the current position of the mouse
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_button_was_pressed = False  # Initialize the mouse button press state as False
+                screen.blit(menu_play_button_default, play_button_area)
+            # Display difficulty button
+            match difficulty:
+                case "easy":
+                    if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
+                        screen.blit(menu_difficulty_easy_button_hover, difficulty_button_area)
+                    else:
+                        screen.blit(menu_difficulty_easy_button_default, difficulty_button_area)
+                case "medium":
+                    if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
+                        screen.blit(menu_difficulty_medium_button_hover, difficulty_button_area)
+                    else:
+                        screen.blit(menu_difficulty_medium_button_default, difficulty_button_area)
+                case "hard":
+                    if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
+                        screen.blit(menu_difficulty_hard_button_hover, difficulty_button_area)
+                    else:
+                        screen.blit(menu_difficulty_hard_button_default, difficulty_button_area)
+            # Display instructions button
+            if instructions_button_area.collidepoint((mouse_x, mouse_y)):
+                screen.blit(menu_instructions_button_hover, instructions_button_area)
+            else:
+                screen.blit(menu_instructions_button_default, instructions_button_area)
+        else:
+            screen.blit(instructions_background, (0, 0))
 
         # Using a dictionary to store information about difficulty levels
+        # difficulty = difficulty_dict[difficulty]['next']
         difficulty_dict = {
             'easy': {'default': menu_difficulty_easy_button_default, 'hover': menu_difficulty_easy_button_hover, 'click': menu_difficulty_easy_button_click, 'next': 'medium'},
             'medium': {'default': menu_difficulty_medium_button_default, 'hover': menu_difficulty_medium_button_hover, 'click': menu_difficulty_medium_button_click, 'next': 'hard'},
             'hard': {'default': menu_difficulty_hard_button_default, 'hover': menu_difficulty_hard_button_hover, 'click': menu_difficulty_hard_button_click, 'next': 'easy'}
         }
-
-        # Handle interactions with the play button
-        # click_condition is True means the button will react to being clicked
-        mouse_button_was_pressed = handle_button(play_button_area, menu_play_button_default, menu_play_button_hover, menu_play_button_click, True)
-        if mouse_button_was_pressed:
-            menu = False  # Change menu to False if play button is clicked.
-
-        # Handle interactions with the difficulty button
-        current_difficulty = difficulty_dict[difficulty]  # Retrieve the current difficulty settings
-        mouse_button_down = handle_button(difficulty_button_area, current_difficulty['default'], current_difficulty['hover'], current_difficulty['click'], mouse_button_down)  # Get click status
-        if mouse_button_down:
-            change_difficulty()  # If difficulty button clicked, change the difficulty
-            mouse_button_down = False  # Reset the button click condition, making ready for next press
-
-        # Handle interactions with the instructions button
-        # click_condition is True means the button will react to being clicked
-        mouse_button_was_pressed = handle_button(instructions_button_area, menu_instructions_button_default, menu_instructions_button_hover, menu_instructions_button_click, True)
-
     pygame.display.flip()
 pygame.quit()
-
-
