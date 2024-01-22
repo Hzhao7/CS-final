@@ -465,7 +465,7 @@ while running:
                 if upgrades > 0:
                     speed_upgrades += 1
                     upgrades -= 1
-                    player_speed += 2.5*difficulty_factor
+                    player_speed += 2.5
                     bullet_speed += 5*difficulty_factor              
     for i,bullet in enumerate(bullets): # for each bullet on screen it will update their position every frame
         bullet.update()
