@@ -1,7 +1,7 @@
 # Author: Henry Zhao, Benjamin Lu
 # Date: 22nd January 2024
 # Course: ICS3U0-B
-# Description: Vapire Dyres is a 2D top down shooter where the main goal is to survive as long as possible. The player can move around the screen using WASD and shoot with left mouse. Enemies will spawn in depending on how long you have survived for. Hoever, their spawn rates will rapidly increase the longer you are alive. To counter this, you have the chance to upgrade your damage, max health, and speed as the game goes on. 
+# Description: Vampire Dyres is a 2D top down shooter where the main goal is to survive as long as possible. The player can move around the screen using WASD and shoot with left mouse. Enemies will spawn in depending on how long you have survived for. Hoever, their spawn rates will rapidly increase the longer you are alive. To counter this, you have the chance to upgrade your damage, max health, and speed as the game goes on. 
 
 import pygame
 import random
