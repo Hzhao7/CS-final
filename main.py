@@ -1,7 +1,7 @@
 # Author: Henry Zhao, Benjamin Lu
 # Date: 22nd January 2024
 # Course: ICS3U0-B
-# Description: ADD WHEN DONE ADD WHEN DONE ADD WHEN DONE
+# Description: Vapire Dyres is a 2D top down shooter where the main goal is to survive as long as possible. The player can move around the screen using WASD and shoot with left mouse. Enemies will spawn in depending on how long you have survived for. Hoever, their spawn rates will rapidly increase the longer you are alive. To counter this, you have the chance to upgrade your damage, max health, and speed as the game goes on. 
 
 import pygame
 import random
@@ -26,6 +26,8 @@ menu = True
 difficulty = "easy"
 difficulty_factor = 2
 instructions = False
+
+# Loading menu images
 try:
     menu_image = pygame.image.load('menu_background.jpg')
 except:
@@ -135,14 +137,14 @@ except:
     print("[DEBUG] Unable to locate floor.png file")
     floor_img = pygame.image.load('missing_asset.png')
 
-# Player code
+# Player image
 try:
     image = pygame.image.load('player_left.png') #loads the protagonist image
 except:
     print("[DEBUG] Unable to locate player_left.png file")
     image = pygame.image.load("missing_asset.png")
 
-# reticle
+# reticle image
 try:
     reticle = pygame.image.load('reticle.png')
 except:
@@ -151,6 +153,7 @@ except:
 reticle_rect = pygame.Rect(width/2, height/2, 1, 1)
 pygame.mouse.set_visible(False)
 
+# Player code
 def draw_player(player):
     screen.blit(protagonist, (player.x,player.y)) #draws the player onto the screen using the rectangle's coordinates
 player = pygame.Rect(640-64, 360-64, 64, 64) #creates a rectangle for the player to check collision
@@ -197,16 +200,16 @@ class Enemy:
 
         self.rectangle = random.choice(position_options)
 
-    def _get_angle(self, player_x, player_y): # refactor the calculations of getting an angle into a function for more readability
+    def _get_angle(self, player_x, player_y): # gets the angle between the player and the enemy
         try:
             return math.atan(abs(player_y-self.rectangle.y)/abs(player_x-self.rectangle.x))
         except ZeroDivisionError:
-            return math.pi* 3/2 if self.rectangle.y < player_y else math.pi* 1/2 # eliminates the crash where they share the same x coordinate
+            return math.pi* 3/2 if self.rectangle.y < player_y else math.pi* 1/2 # eliminates the crash where the player and the enemy share the same x coordinate
 
     def move_to_player(self, player_x, player_y):
-        angle = self._get_angle(player_x, player_y) # use the newly created function
+        angle = self._get_angle(player_x, player_y) 
         rotated = pygame.transform.rotate(self.sprite, 360-(angle*180/math.pi))
-        screen.blit(rotated, (self.rectangle.x, self.rectangle.y))
+        screen.blit(rotated, (self.rectangle.x, self.rectangle.y)) # Rotates the image to align to the player
 
         # Calculate movement separately
         x_movement = self.speed*math.cos(angle)
@@ -216,27 +219,30 @@ class Enemy:
         self.rectangle.x += x_movement if self.rectangle.x < player_x else -x_movement
         self.rectangle.y += y_movement if self.rectangle.y < player_y else -y_movement
 
-    def player_collision(self, player_rect): # corrected spelling of function name
-        if self.rectangle.colliderect(player_rect):
-            global player_health # consider passing player_health as a parameter rather than using global variable,
+    def player_collision(self, player_rect): 
+        if self.rectangle.colliderect(player_rect): # checks if the enemy is hitting the player
+            global player_health 
             player_health -= self.damage
-            self.speed = 0
+            self.speed = 0 # the enemy will stop moving if it is hitting
         else:
-            self.speed = self.stored_speed # used the renamed variable
-    def take_damage(self, damage):
+            self.speed = self.stored_speed # resets the speed once the enemy is not hitting the player
+
+    def take_damage(self, damage): # Everytime and enemy takes damage they will display an indicator for how much damage was done
         self.health -= damage
         damage_font = pygame.font.Font('freesansbold.ttf', 32)
         damage_text = damage_font.render("{}".format(damage), True, (255,255,255), (0,0,0))
         text_rect = pygame.Rect(self.rectangle.x+self.sprite_width/2, self.rectangle.y-25, 1,1)
-        screen.blit(damage_text,text_rect)
-    def is_dead(self):
+        screen.blit(damage_text,text_rect) 
+
+    def is_dead(self): # returns if the enemy is dead or not
         if self.health <= 0:
             return True
         else:
             return False
         
-# enemy spawning
+# Functions for creating different enemies and creates an empty list to add enemies to.
 enemies = []
+spawn_factor = 60 # controls how fast they spawn
 def spawn_bat(): 
     enemies.append(Enemy('bat.png', 64, 64, 10, 4, 0.5))
 def spawn_vampire():
@@ -244,7 +250,7 @@ def spawn_vampire():
 def spawn_vampire_boss():
     enemies.append(Enemy('Vampire_boss.png', 128, 90, 250, 1, 2))
     
-# bullet class code
+# bullet class code and bullet global variables.
 bullet_damage = 5
 bullet_speed = 10
 bullets = []
@@ -264,7 +270,7 @@ class Bullet(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(center = (player_x, player_y))
         else:
             self.rect = self.image.get_rect(center = (player_x+64, player_y))
-    def get_angle(self, mouse_x, mouse_y): # refactor the calculations of getting an angle into a function for more readability
+    def get_angle(self, mouse_x, mouse_y): # gets the angle between the player and the mouse position
         try:
             self.angle = math.atan2((mouse_y-self.rect.y),(mouse_x-self.rect.x))
         except ZeroDivisionError:
@@ -275,11 +281,11 @@ class Bullet(pygame.sprite.Sprite):
         x_movement = self.speed*math.cos(self.angle)
         y_movement = self.speed*math.sin(self.angle)
 
-        # Update x and y position based on player's position
+        # Update x and y position based on the angle stored
         self.rect.x += x_movement if self.angle < math.pi/2 or (self.angle > 1/2*math.pi) else -x_movement
         self.rect.y += y_movement if self.angle < math.pi else -y_movement  
 
-# upgrades 
+# upgrade image loading and storing the anmount of each and available upgrades.
 try:
     damage_upgrade_tracker = pygame.image.load('damage_upgrade_tracker.png')
 except:
@@ -300,6 +306,8 @@ except:
 speed_upgrades = 0
 upgrades = 0
 upgrade_text_box = pygame.Rect(15, height-160, 1, 1)
+
+# draws the upgrade box and how much that upgrade has been upgraded
 def draw_upgrade(text, block_height, upgrades):
     font = pygame.font.Font('freesansbold.ttf', 14)
     upgrade_text = font.render(text, True, (255,255,255))
@@ -315,11 +323,9 @@ def draw_upgrade(text, block_height, upgrades):
         screen.blit(upgrade_tracker, (18.5+50*n, block_height))
     screen.blit(upgrade_text, (text_rect.x, text_rect.y))
 
-
-
-spawn_factor = 60 # controls how fast they spawn
+# main loop
 while running:
-    #sets to 60 fps
+    #sets to a max of 60 fps
     clock.tick(60)
     # gets mouse coordinates
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -355,12 +361,13 @@ while running:
             spawn_factor = spawn_factor*0.5*difficulty_factor
         else:
             spawn_factor = spawn_factor*0.5
-    # every 15 seconds you get an upgrade, if the player is already maxed it heals the player to full
+    # every number of seconds the player gets an upgrade
     if frame % (900/difficulty_factor) == 0:
-        if (speed_upgrades+health_upgrades+damage_upgrades) == 18:
+        if (speed_upgrades+health_upgrades+damage_upgrades+upgrades) == 18: #if the player is maxed on upgrades it will heal the player to max instead
             player_health = total_health
         else:
             upgrades += 1  
+
     # Event handling for key presses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and player.x - player_speed > 0:  #associates the keypressed to the movement of the player and checks if it will go off screen
@@ -384,10 +391,10 @@ while running:
     if keys[pygame.K_s] and player.y + player_speed + 66 < height:  
         y_move += player_speed  
     
-    if x_move != 0 and y_move !=0: 
+    if x_move != 0 and y_move !=0: # if the player is moving diagonally, it reduces the x and y speed to prevent the player from moving faster
         x_move = x_move*math.sqrt(2)/2
         y_move = y_move*math.sqrt(2)/2
-
+    # moves the player
     player.x += x_move
     player.y += y_move
     draw_player(player)
@@ -439,12 +446,12 @@ while running:
             # ===================================================
             bullet = Bullet(player.x, player.y)
             bullet.get_angle(mouse_x,mouse_y)
-            bullets.append(bullet)
+            bullets.append(bullet) # if the mouse left is clicked a bullet will be added to the list of bullets
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_button_down = False
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN: # adds the upgrades if the player presses the respective button
             if event.key == pygame.K_1:
-                if upgrades > 0 and damage_upgrades < 6:
+                if upgrades > 0 and damage_upgrades < 6: # checks if the player has available upgrades and the player is not already capped on the respective upgrade
                     damage_upgrades += 1
                     upgrades -= 1
                     bullet_damage += 5*difficulty_factor
@@ -460,21 +467,21 @@ while running:
                     upgrades -= 1
                     player_speed += 2.5*difficulty_factor
                     bullet_speed += 5*difficulty_factor              
-    for i,bullet in enumerate(bullets):
+    for i,bullet in enumerate(bullets): # for each bullet on screen it will update their position every frame
         bullet.update()
-        if bullet.rect.x >= width + 100 or bullet.rect.y >= height + 100 or bullet.rect.x <= -100 or bullet.rect.y <= -100:
+        if bullet.rect.x >= width + 100 or bullet.rect.y >= height + 100 or bullet.rect.x <= -100 or bullet.rect.y <= -100: # if the bullet is out of bounds it gets removed
             bullets.pop(i)
         for enemy in enemies:
-            if bullet.rect.colliderect(enemy.rectangle):
+            if bullet.rect.colliderect(enemy.rectangle): # if a bullet hits an enemy it will take damage and the bullet disappears
                 try:
                     bullets.pop(i)
-                except IndexError: # there is a thing that crashes if you are hit and shooting and this catches it
+                except IndexError: # If multiple enemies are hit by a bullet, the program tries to remove the same bullet more than once creating an index error. If that happens the program continues and only one enemy takes damage
                     continue
                 enemy.take_damage(bullet_damage)
-    for i,enemy in enumerate(enemies):
+    for i,enemy in enumerate(enemies): # Moves every enemy and checks if they collide with the player
         enemy.move_to_player(player.x, player.y)
         enemy.player_collision(player)
-        if enemy.is_dead():
+        if enemy.is_dead(): # if the enemy is dead it removes them from the screen
             enemies.pop(i)
 
     #reticle code
@@ -538,8 +545,7 @@ while running:
     pygame.display.flip()
 
 # record down the high score before quitting
-if mins >= int(highscore_lines[0].strip()) and secs > int(highscore_lines[1].strip()):
-    print("true")
+if mins >= int(highscore_lines[0].strip()) and secs > int(float(highscore_lines[1].strip())):
     L = [f'{mins}\n', f'{secs}']
     high_score = open("highscore.txt", "w")
     high_score.writelines(L)
