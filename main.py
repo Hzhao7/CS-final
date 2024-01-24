@@ -28,107 +28,33 @@ difficulty_factor = 2
 instructions = False
 
 # Loading menu images
-try:
-    menu_image = pygame.image.load('menu_background.jpg')
-except:
-    print("[DEBUG] Unable to locate menu_background.jpg file")
-    menu_image = pygame.image.load('missing_asset.png')
+image_files = [
+    'menu_background.jpg',
+    'instructions_background.jpg',
+    'menu_play_button_default.png',
+    'menu_play_button_hover.png',
+    'menu_play_button_click.png',
+    'menu_instructions_button_default.png',
+    'menu_instructions_button_hover.png',
+    'menu_instructions_button_click.png',
+    'menu_difficulty_easy_button_default.png',
+    'menu_difficulty_easy_button_hover.png',
+    'menu_difficulty_easy_button_click.png',
+    'menu_difficulty_medium_button_default.png',
+    'menu_difficulty_medium_button_hover.png',
+    'menu_difficulty_medium_button_click.png',
+    'menu_difficulty_hard_button_default.png',
+    'menu_difficulty_hard_button_hover.png',
+    'menu_difficulty_hard_button_click.png'
+]
 
-try:
-    instructions_background = pygame.image.load('instructions_background.jpg')
-except:
-    print("[DEBUG] Unable to locate instructions_background.jpg file")
-    instructions_background = pygame.image.load('missing_asset.png')
-
-try:
-    menu_play_button_default = pygame.image.load('menu_play_button_default.png')
-except:
-    print("[DEBUG] Unable to locate menu_play_button_default.png file")
-    menu_play_button_default = pygame.image.load('missing_asset.png')
-
-try:
-    menu_play_button_hover = pygame.image.load('menu_play_button_hover.png')
-except:
-    print("[DEBUG] Unable to locate menu_play_button_hover.png file")
-    menu_play_button_hover = pygame.image.load('missing_asset.png')
-
-try:
-    menu_play_button_click = pygame.image.load('menu_play_button_click.png')
-except:
-    print("[DEBUG] Unable to locate menu_play_button_click.png file")
-    menu_play_button_click = pygame.image.load('missing_asset.png')
-
-try:
-    menu_instructions_button_default = pygame.image.load('menu_instructions_button_default.png')
-except:
-    print("[DEBUG] Unable to locate menu_instructions_button_default.png file")
-    menu_instructions_button_default = pygame.image.load('missing_asset.png')
-
-try:
-    menu_instructions_button_hover = pygame.image.load('menu_instructions_button_hover.png')
-except:
-    print("[DEBUG] Unable to locate menu_instructions_button_hover.png file")
-    menu_instructions_button_hover = pygame.image.load('missing_asset.png')
-
-try:
-    menu_instructions_button_click = pygame.image.load('menu_instructions_button_click.png')
-except:
-    print("[DEBUG] Unable to locate menu_instructions_button_click.png file")
-    menu_instructions_button_click = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_easy_button_default = pygame.image.load('menu_difficulty_easy_button_default.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_easy_button_default.png file")
-    menu_difficulty_easy_button_default = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_easy_button_hover = pygame.image.load('menu_difficulty_easy_button_hover.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_easy_button_hover.png file")
-    menu_difficulty_easy_button_hover = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_easy_button_click = pygame.image.load('menu_difficulty_easy_button_click.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_easy_button_click.png file")
-    menu_difficulty_easy_button_click = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_medium_button_default = pygame.image.load('menu_difficulty_medium_button_default.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_medium_button_default.png file")
-    menu_difficulty_medium_button_default = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_medium_button_hover = pygame.image.load('menu_difficulty_medium_button_hover.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_medium_button_hover.png file")
-    menu_difficulty_medium_button_hover = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_medium_button_click = pygame.image.load('menu_difficulty_medium_button_click.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_medium_button_click.png file")
-    menu_difficulty_medium_button_click = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_hard_button_default = pygame.image.load('menu_difficulty_hard_button_default.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_hard_button_default.png file")
-    menu_difficulty_hard_button_default = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_hard_button_hover = pygame.image.load('menu_difficulty_hard_button_hover.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_hard_button_hover.png file")
-    menu_difficulty_hard_button_hover = pygame.image.load('missing_asset.png')
-
-try:
-    menu_difficulty_hard_button_click = pygame.image.load('menu_difficulty_hard_button_click.png')
-except:
-    print("[DEBUG] Unable to locate menu_difficulty_hard_button_click.png file")
-    menu_difficulty_hard_button_click = pygame.image.load('missing_asset.png')
+images = {}
+for image_file in image_files:
+    try:
+        images[image_file] = pygame.image.load(image_file)
+    except:
+        print(f"[DEBUG] Unable to locate {image_file} file")
+        images[image_file] = pygame.image.load('missing_asset.png')
 
 # Load the floor image
 try:
@@ -491,7 +417,7 @@ while running:
     # Main menu
     if menu == True:
         # Show main menu background
-        screen.blit(menu_image, (0, 0))
+        screen.blit(images['menu_background.jpg'], (0, 0))
         # Reveal cursor that was supposed to replaced by recticle
         pygame.mouse.set_visible(True)
         # Stop game progression
@@ -507,40 +433,43 @@ while running:
         if not instructions:
             # Display play button
             if play_button_area.collidepoint((mouse_x, mouse_y)):
-                screen.blit(menu_play_button_hover, play_button_area)
+                screen.blit(images['menu_play_button_hover.png'], play_button_area)
             else:
-                screen.blit(menu_play_button_default, play_button_area)
+                screen.blit(images['menu_play_button_default.png'], play_button_area)
             # Display difficulty button
             match difficulty:
                 case "easy":
                     if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
-                        screen.blit(menu_difficulty_easy_button_hover, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_easy_button_hover.png'], difficulty_button_area)
                     else:
-                        screen.blit(menu_difficulty_easy_button_default, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_easy_button_default.png'], difficulty_button_area)
                 case "medium":
                     if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
-                        screen.blit(menu_difficulty_medium_button_hover, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_medium_button_hover.png'], difficulty_button_area)
                     else:
-                        screen.blit(menu_difficulty_medium_button_default, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_medium_button_default.png'], difficulty_button_area)
                 case "hard":
                     if difficulty_button_area.collidepoint((mouse_x, mouse_y)):
-                        screen.blit(menu_difficulty_hard_button_hover, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_hard_button_hover.png'], difficulty_button_area)
                     else:
-                        screen.blit(menu_difficulty_hard_button_default, difficulty_button_area)
+                        screen.blit(images['menu_difficulty_hard_button_default.png'], difficulty_button_area)
             # Display instructions button
             if instructions_button_area.collidepoint((mouse_x, mouse_y)):
-                screen.blit(menu_instructions_button_hover, instructions_button_area)
+                screen.blit(images['menu_instructions_button_hover.png'], instructions_button_area)
             else:
-                screen.blit(menu_instructions_button_default, instructions_button_area)
+                screen.blit(images['menu_instructions_button_default.png'], instructions_button_area)
         else:
-            screen.blit(instructions_background, (0, 0))
+            screen.blit(images['instructions_background.jpg'], (0, 0))
 
         # Using a dictionary to store information about difficulty levels
         # difficulty = difficulty_dict[difficulty]['next']
         difficulty_dict = {
-            'easy': {'default': menu_difficulty_easy_button_default, 'hover': menu_difficulty_easy_button_hover, 'click': menu_difficulty_easy_button_click, 'next': 'medium'},
-            'medium': {'default': menu_difficulty_medium_button_default, 'hover': menu_difficulty_medium_button_hover, 'click': menu_difficulty_medium_button_click, 'next': 'hard'},
-            'hard': {'default': menu_difficulty_hard_button_default, 'hover': menu_difficulty_hard_button_hover, 'click': menu_difficulty_hard_button_click, 'next': 'easy'}
+            # 'easy': {'default': menu_difficulty_easy_button_default, 'hover': menu_difficulty_easy_button_hover, 'click': menu_difficulty_easy_button_click, 'next': 'medium'},
+            # 'medium': {'default': menu_difficulty_medium_button_default, 'hover': menu_difficulty_medium_button_hover, 'click': menu_difficulty_medium_button_click, 'next': 'hard'},
+            # 'hard': {'default': menu_difficulty_hard_button_default, 'hover': menu_difficulty_hard_button_hover, 'click': menu_difficulty_hard_button_click, 'next': 'easy'}
+            'easy': {'default': images['menu_difficulty_easy_button_default.png'], 'hover': images['menu_difficulty_easy_button_hover.png'], 'click': images['menu_difficulty_easy_button_click.png'], 'next': 'medium'},
+            'medium': {'default': images['menu_difficulty_medium_button_default.png'], 'hover': images['menu_difficulty_medium_button_hover.png'], 'click': images['menu_difficulty_medium_button_click.png'], 'next': 'hard'},
+            'hard': {'default': images['menu_difficulty_hard_button_default.png'], 'hover': images['menu_difficulty_hard_button_hover.png'], 'click': images['menu_difficulty_hard_button_click.png'], 'next': 'easy'}
         }
     pygame.display.flip()
 
