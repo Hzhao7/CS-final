@@ -464,9 +464,6 @@ while running:
         # Using a dictionary to store information about difficulty levels
         # difficulty = difficulty_dict[difficulty]['next']
         difficulty_dict = {
-            # 'easy': {'default': menu_difficulty_easy_button_default, 'hover': menu_difficulty_easy_button_hover, 'click': menu_difficulty_easy_button_click, 'next': 'medium'},
-            # 'medium': {'default': menu_difficulty_medium_button_default, 'hover': menu_difficulty_medium_button_hover, 'click': menu_difficulty_medium_button_click, 'next': 'hard'},
-            # 'hard': {'default': menu_difficulty_hard_button_default, 'hover': menu_difficulty_hard_button_hover, 'click': menu_difficulty_hard_button_click, 'next': 'easy'}
             'easy': {'default': images['menu_difficulty_easy_button_default.png'], 'hover': images['menu_difficulty_easy_button_hover.png'], 'click': images['menu_difficulty_easy_button_click.png'], 'next': 'medium'},
             'medium': {'default': images['menu_difficulty_medium_button_default.png'], 'hover': images['menu_difficulty_medium_button_hover.png'], 'click': images['menu_difficulty_medium_button_click.png'], 'next': 'hard'},
             'hard': {'default': images['menu_difficulty_hard_button_default.png'], 'hover': images['menu_difficulty_hard_button_hover.png'], 'click': images['menu_difficulty_hard_button_click.png'], 'next': 'easy'}
